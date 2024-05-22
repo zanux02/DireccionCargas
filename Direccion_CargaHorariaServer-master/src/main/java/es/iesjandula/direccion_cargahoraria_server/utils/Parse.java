@@ -523,19 +523,7 @@ public class Parse
 		boolean asignaturaEncontrada=false;
 		boolean cursoExiste = false;
 		Curso cursoAsignacion = new Curso(curso,etapa,grupo);
-		for(Curso cursoComprobante : listaCursos)
-		{
-			if(cursoComprobante.equals(cursoAsignacion))
-			{
-				cursoExiste = true;
-			}
-		}
-		if(!cursoExiste)
-		{
-			String error = "Curso no encontrado";
-			log.info(error);
-			throw new HorarioException(13,error);
-		}
+		comprobarCurso(listaCursos, cursoExiste, cursoAsignacion);
 		asignaturaObject.setCurso(curso);
 		asignaturaObject.setEtapa(etapa);
 		asignaturaObject.setGrupo(grupo);
@@ -553,5 +541,109 @@ public class Parse
 		}
 		datosAsignacion.add(asignaturaObject);
 	}
+
+	public void comprobarCurso(List<Curso> listaCursos, boolean cursoExiste, Curso cursoAsignacion)
+			throws HorarioException {
+		for(Curso cursoComprobante : listaCursos)
+		{
+			if(cursoComprobante.equals(cursoAsignacion))
+			{
+				cursoExiste = true;
+			}
+		}
+		if(!cursoExiste)
+		{
+			String error = "Curso no encontrado";
+			log.info(error);
+			throw new HorarioException(13,error);
+		}
+	}
 	
+	public void comprobarIdProfesor(String idProfesor, List<Profesor> listaProfesores, boolean idProfesorExiste)
+			throws HorarioException 
+	{
+		for(Profesor profesor : listaProfesores)
+		{
+			if(profesor.getIdProfesor().equals(idProfesor))
+			{
+				idProfesorExiste = true;
+			}
+		}
+		if(!idProfesorExiste)
+		{
+			String error = "Profesor no encontrado";
+			log.info(error);
+			throw new HorarioException(13,error);
+		}
+	}
+	public List<Departamento> comprobarListaDepartamentos(HttpSession session, List<Departamento> listaDepartamentos)
+			throws HorarioException 
+	{
+		if(session.getAttribute("listaDepartamentos")!=null)
+		{
+			listaDepartamentos = (List<Departamento>) session.getAttribute("listaDepartamentos");
+		}
+		else 
+		{
+			String error = "Los departamentos no han sido cargados en sesion todavía";
+			throw new HorarioException(1,error);
+		}
+		return listaDepartamentos;
+	}
+	
+	public List<Curso> comprobarListCursos(HttpSession session, List<Curso> listaCursos) throws HorarioException {
+		if(session.getAttribute("listaCursos")!=null)
+		{
+			listaCursos = (List<Curso>) session.getAttribute("listaCursos");
+		}
+		else
+		{
+			String error = "Los cursos no han sido cargados en sesion todavía";
+			throw new HorarioException(1,error);
+		}
+		return listaCursos;
+	}
+	
+	public List<Profesor> comprobarListaProfesores(HttpSession session, List<Profesor> listaProfesores)
+			throws HorarioException {
+		if(session.getAttribute("listaProfesores")!=null)
+		{
+			listaProfesores = (List<Profesor>) session.getAttribute("listaProfesores");
+		}
+		else 
+		{
+			String error = "Los profesores no han sido cargados en sesion todavía";
+			throw new HorarioException(1,error);
+		}
+		return listaProfesores;
+	}
+	
+	public List<Asignatura> comprobarListaAsignaturas(HttpSession session, List<Asignatura> listaAsignaturas)
+			throws HorarioException {
+		if(session.getAttribute("listaAsignaturas")!=null)
+		{
+			listaAsignaturas = (List<Asignatura>) session.getAttribute("listaAsignaturas");
+		}
+		else
+		{
+			String error = "Las asignatura no han sido cargados en sesion todavía";
+			throw new HorarioException(1,error);
+		}
+		return listaAsignaturas;
+	}
+	
+	public List<Reduccion> comprobarListaReducciones(HttpSession session, List<Reduccion> listaReducciones)
+			throws HorarioException {
+		if(session.getAttribute("listaReducciones")!=null)
+		{
+			listaReducciones = (List<Reduccion>) session.getAttribute("listaReducciones");
+		}
+		else 
+		{
+			String error = "Las reducciones no han sido cargados en sesion todavía";
+			throw new HorarioException(1,error);
+		}
+		return listaReducciones;
+	}
+
 }

@@ -75,18 +75,11 @@ public class RestHandler
 	public ResponseEntity<?> consultaDepartamentos(HttpSession session)
 	{
 		try
-		{
-			List<Departamento> listaDepartamentos;
+		{ 
+			Parse parse = new Parse();
+			List<Departamento> listaDepartamentos = null;
 			//comprobamos si la lista existe
-			if(session.getAttribute("listaDepartamentos")!=null)
-			{
-				listaDepartamentos = (List<Departamento>) session.getAttribute("listaDepartamentos");
-			}
-			else 
-			{
-				String error = "Los departamentos no han sido cargados en sesion todavía";
-				throw new HorarioException(1,error);
-			}
+			listaDepartamentos = parse.comprobarListaDepartamentos(session, listaDepartamentos);
 
 			log.info(listaDepartamentos);
 			return ResponseEntity.ok(listaDepartamentos);
@@ -105,7 +98,8 @@ public class RestHandler
 			return ResponseEntity.status(400).body(error);
 		}
 	}
-	
+
+		
 	/**
 	 * endpoint para subir los cursos
 	 * @param csvFile
@@ -150,17 +144,10 @@ public class RestHandler
 	{
 		try
 		{
-			List<Curso> listaCursos;
+			Parse parse = new Parse();
+			List<Curso> listaCursos = null;
 			//comprobamos si la lista existe
-			if(session.getAttribute("listaCursos")!=null)
-			{
-				listaCursos = (List<Curso>) session.getAttribute("listaCursos");
-			}
-			else
-			{
-				String error = "Los cursos no han sido cargados en sesion todavía";
-				throw new HorarioException(1,error);
-			}
+			listaCursos = parse.comprobarListCursos(session, listaCursos);
 
 			log.info(listaCursos);
 			return ResponseEntity.ok().body(listaCursos);
@@ -179,6 +166,8 @@ public class RestHandler
 			return ResponseEntity.status(400).body(error);
 		}
 	}
+
+	
 	
 	/**
 	 * endpoint para subir los profesores
@@ -233,17 +222,10 @@ public class RestHandler
 	{
 		try
 		{
-			List<Profesor> listaProfesores;
+			Parse parse = new Parse();
+			List<Profesor> listaProfesores = null;
 			//comprobamos si existe la lista profesores
-			if(session.getAttribute("listaProfesores")!=null)
-			{
-				listaProfesores = (List<Profesor>) session.getAttribute("listaProfesores");
-			}
-			else 
-			{
-				String error = "Los profesores no han sido cargados en sesion todavía";
-				throw new HorarioException(1,error);
-			}
+			listaProfesores = parse.comprobarListaProfesores(session, listaProfesores);
 
 			log.info(listaProfesores);
 			return ResponseEntity.ok().body(listaProfesores);
@@ -262,6 +244,8 @@ public class RestHandler
 			return ResponseEntity.status(400).body(exception.getMessage());
 		}
 	}
+
+	
 	
 	/**
 	 * endpoint para subir las asignaturas
@@ -321,17 +305,10 @@ public class RestHandler
 	{
 		try
 		{
-			List<Asignatura> listaAsignaturas;
+			Parse parse = new Parse();
+			List<Asignatura> listaAsignaturas = null;
 			//comprobamos si existe la lista asignaturas
-			if(session.getAttribute("listaAsignaturas")!=null)
-			{
-				listaAsignaturas = (List<Asignatura>) session.getAttribute("listaAsignaturas");
-			}
-			else
-			{
-				String error = "Las asignatura no han sido cargados en sesion todavía";
-				throw new HorarioException(1,error);
-			}
+			listaAsignaturas = parse.comprobarListaAsignaturas(session, listaAsignaturas);
 
 			log.info(listaAsignaturas);
 			return ResponseEntity.ok().body(listaAsignaturas);
@@ -350,6 +327,8 @@ public class RestHandler
 			return ResponseEntity.status(400).body(error);
 		}
 	}
+
+	
 	
 	/**
 	 * endpoint para asignar una asignatura a un profesor
@@ -470,17 +449,10 @@ public class RestHandler
 	{
 		try
 		{
-			List<Reduccion> listaReducciones;
+			Parse parse = new Parse();
+			List<Reduccion> listaReducciones = null;
 			//comprobamos si la lista reducciones existe
-			if(session.getAttribute("listaReducciones")!=null)
-			{
-				listaReducciones = (List<Reduccion>) session.getAttribute("listaReducciones");
-			}
-			else 
-			{
-				String error = "Las reducciones no han sido cargados en sesion todavía";
-				throw new HorarioException(1,error);
-			}
+			listaReducciones = parse.comprobarListaReducciones(session, listaReducciones);
 			log.info(listaReducciones);
 			return ResponseEntity.ok().body(listaReducciones);
 		}
@@ -498,6 +470,8 @@ public class RestHandler
 			return ResponseEntity.status(400).body(error);
 		}
 	}
+
+	
 	
 	/**
 	 * endpoint para asignar reducciones a un profesor
@@ -514,42 +488,17 @@ public class RestHandler
 		try
 		{
 			Map<String,List<ReduccionHoras>> asignacionReduccion = (Map<String, List<ReduccionHoras>>) session.getAttribute("mapaReduccion");	
-			
+			Parse parse = new Parse();
 			List<Profesor> listaProfesores = (List<Profesor>) session.getAttribute("listaProfesores");
 			List<Reduccion> listaReducciones = (List<Reduccion>) session.getAttribute("listaReducciones");
 			List<ReduccionHoras> listaReduccionHoras = new ArrayList<ReduccionHoras>();
 			boolean idProfesorExiste = false;
-			//recorremos la lista de profesores para comprobar si existe el idprofesor que recibimos
-			for(Profesor profesor : listaProfesores)
-			{
-				if(profesor.getIdProfesor().equals(idProfesor))
-				{
-					idProfesorExiste = true;
-				}
-			}
-			if(!idProfesorExiste)
-			{
-				String error = "Profesor no encontrado";
-				log.info(error);
-				throw new HorarioException(13,error);
-			}
+			parse.comprobarIdProfesor(idProfesor, listaProfesores, idProfesorExiste);
 			
 			boolean idReduccionExiste = false;
 			//recorremos la lista reducciones para comprobar si existe el idreduccion que recibimos
-			for(Reduccion reduccion : listaReducciones)
-			{
-				if(reduccion.getIdReduccion().equals(idReduccion))
-				{
-					idReduccionExiste = true;
-				}
-			}
-			if(!idReduccionExiste)
-			{
-				String error = "Reduccion no encontrada";
-				log.info(error);
-				throw new HorarioException(13,error);
-			}
-			Parse parse = new Parse();
+			parse.comprobarListaReducciones(session, listaReducciones);
+			
 			//llamamos al metodo realizarReduccion
 			asignacionReduccion = parse.realizarReduccion(idProfesor, idReduccion, session, listaReducciones, listaReduccionHoras);
 			
@@ -583,22 +532,10 @@ public class RestHandler
 	{
 		try
 		{
+			Parse parse = new Parse();
 			List<Profesor> listaProfesores = (List<Profesor>) session.getAttribute("listaProfesores");
 			boolean idProfesorExiste = false;
-			//bucle para comprobar si existe el idProfesor recibido
-			for(Profesor profesor : listaProfesores)
-			{
-				if(profesor.getIdProfesor().equals(idProfesor))
-				{
-					idProfesorExiste = true;
-				}
-			}
-			if(!idProfesorExiste)
-			{
-				String error = "Profesor no encontrado";
-				log.info(error);
-				throw new HorarioException(13,error);
-			}
+			parse.comprobarIdProfesor(idProfesor, listaProfesores, idProfesorExiste);
 			
 			Map<String,Integer> mapaGuardias;
 			//comprobamos si se ha creado el mapa de guardias
@@ -642,24 +579,11 @@ public class RestHandler
 	{
 		try
 		{
-			
+			Parse parse = new Parse();
 			List<Profesor> listaProfesores = (List<Profesor>) session.getAttribute("listaProfesores");
 			boolean idProfesorExiste = false;
 			//bucle para comprobar si existe el idProfesor
-			for(Profesor profesor : listaProfesores)
-			{
-				if(profesor.getIdProfesor().equals(idProfesor))
-				{
-					idProfesorExiste = true;
-				}
-			}
-			if(!idProfesorExiste)
-			{
-				String error = "Profesor no encontrado";
-				log.info(error);
-				throw new HorarioException(13,error);
-			}
-			Parse parse = new Parse();
+			parse.comprobarIdProfesor(idProfesor, listaProfesores, idProfesorExiste);
 			//llamamos el metodo resumenProfesor
 			ResumenProfesor resumen = parse.resumenProfesor(idProfesor, session);
 			return ResponseEntity.ok().body(resumen);
@@ -675,6 +599,8 @@ public class RestHandler
 			return ResponseEntity.status(400).body(exception.getMessage());
 		}
 	}
+
+	
 
 	
 	
